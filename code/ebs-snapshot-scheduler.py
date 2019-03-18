@@ -26,6 +26,12 @@ cf_client = boto3.client('cloudformation')
 def backup_instance(ec2, instance_obj, retention_days, history_table, aws_region):
     new_snapshot_list = []
     for volume in instance_obj.volumes.all():
+
+        # Custom edit to avoid taking snapshots of system disks
+        if volume.snapshot_id in ['snap-0cc29368929a12a54', 'snap-0c274994904e7f01c']:
+            print 'Skipping system disk %s' % volume.id
+            continue
+
         current_time = datetime.datetime.utcnow()
         current_time_str = current_time.strftime(
             "%h %d,%H:%M")
